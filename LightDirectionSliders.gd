@@ -3,7 +3,7 @@ extends VBoxContainer
 @export var mesh:MeshInstance3D
 @onready var mesh_material:Material = mesh.material_override
 
-var lightPosition:Vector3 = Vector3(180, 180, 180)
+var lightPosition:Vector3 = Vector3(0, 0.5, 1)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

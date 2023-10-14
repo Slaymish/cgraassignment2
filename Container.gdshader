@@ -1,61 +1,47 @@
 shader_type spatial;
 
-// User-defined sliders as uniforms
-uniform float ao_slider : hint_range(0, 1);
-uniform float diffuse_slider : hint_range(0, 1);
-uniform float specular_slider : hint_range(0, 10);
-uniform float shininess_slider : hint_range(0, 100);
 
-uniform vec3 light_color;
+uniform vec3 ao_color = vec3(0, 0, 0);
+uniform vec3 diffuse_color = vec3(0, 0, 0);
+uniform vec3 specular_color = vec3(0, 0, 0);
+
+uniform vec3 model_color = vec3(1.0,1.0,1.0);
 
 // Light settings
-uniform vec3 light_position;
-uniform vec3 light_intensity;
+uniform vec3 light_color = vec3(1.0, 1.0, 1.0);
+uniform vec3 light_position = vec3(0, 0.5, 1);
 
-// Uniforms for controlling the wave
-uniform float wave_frequency : hint_range(0.0, 10.0) = 1.0;
-uniform float wave_amplitude : hint_range(0.0, 2.0) = 0.1;
-uniform float wave_speed : hint_range(0.0, 2.0) = 0.5;
+uniform float light_strength = 1.0;
 
-void vertex() {
-    // Calculate the wave function based on vertex y-coordinate, time, and frequency
-    float wave = wave_amplitude * sin(wave_frequency * VERTEX.y + TIME * wave_speed);
+// Strengths
+uniform float ao_strength = 0;
+uniform float diffuse_strength = 0;
+uniform float specular_strength = 0;
+uniform float shininess_amount = 2;
+
+void fragment() {	
+	vec3 diffuse_light = diffuse_color * light_strength;
+	vec3 ao_light = ao_color * light_strength;	
+	vec3 specular_light = specular_color * light_strength;
+	
+	
+	// Calculate AO
+	vec3 ambient = ao_light * ao_strength;
+	
+	// Calculate Diffuse	
+	float diffuseStrength = dot(light_position,NORMAL);
+	vec3 diffuse = diffuseStrength * diffuse_light;
+	
+	// Calculate Specular	
+	vec3 reflectSource = normalize(reflect(-light_position, NORMAL)); // normalised
+	float specularStrength = dot(VIEW, reflectSource);
+	specularStrength = pow(specularStrength,shininess_amount); // makes it shiny
+	vec3 specular = specularStrength * specular_light;
+	
+	// Combine all to get final color
+    vec3 lighting = (ambient * ao_strength)
+	+ (diffuse * diffuse_strength)
+	+ (specular * specular_strength);
     
-    // Extract the horizontal components of the normal
-    vec3 horizontal_normal = NORMAL;
-    horizontal_normal.y = 0.0;  // Remove the vertical component
-    
-    // Apply the wave offset along the horizontal components of the normal vector
-    VERTEX += horizontal_normal * wave;
-}
-
-void fragment() {
-    vec3 hitPoint = FRAGCOORD.xyz;
-    vec3 hitNormal = NORMAL;
-    vec3 dir = normalize(hitPoint - VIEW_MATRIX[3].xyz); // From hit point to camera
-
-    // Phong components
-    vec3 ambient = vec3(0.0);
-    vec3 diffuse = vec3(0.0);
-    vec3 specular = vec3(0.0);
-
-    // Light calculations
-    vec3 lightDir = normalize(light_position - hitPoint);
-    float vis = 1.0; // Visibility, implement your logic here if needed
-    vec3 lightIntensity = light_color;
-
-    // Compute the ambient component
-    ambient = ao_slider * light_color;  // Assuming white ambient light for now
-    
-    // Compute the diffuse component
-    diffuse = diffuse_slider * lightIntensity * max(0.0, dot(hitNormal, -lightDir));
-
-    // Compute the specular component
-    vec3 R = reflect(-lightDir, hitNormal);
-    specular = specular_slider * lightIntensity * pow(max(0.0, dot(R, -dir)), shininess_slider);
-
-    // Combine all to get final color
-    vec3 hitColor = ambient + diffuse + specular;
-    
-    ALBEDO = hitColor;
+    ALBEDO = model_color * lighting;
 }
