@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://de4yb70vw58v6"
+path="res://.godot/imported/husk_armchair_OBJ.obj-3a60f940d33df1ba103eed8ae0641695.mesh"
+
+[deps]
+
+files=["res://.godot/imported/husk_armchair_OBJ.obj-3a60f940d33df1ba103eed8ae0641695.mesh"]
+
+source_file="res://armchair/husk_armchair_OBJ.obj"
+dest_files=["res://.godot/imported/husk_armchair_OBJ.obj-3a60f940d33df1ba103eed8ae0641695.mesh", "res://.godot/imported/husk_armchair_OBJ.obj-3a60f940d33df1ba103eed8ae0641695.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
